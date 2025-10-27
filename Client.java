@@ -3,37 +3,37 @@ import java.net.*;
 
 public class Client {
     public static void main(String[] args) {
-        String host = "127.0.0.1"; // Localhost (same machine)
-        int port = 5000;
+        try {
+            // Connect to server on localhost and port 5000
+            Socket socket = new Socket("localhost", 5000);
+            System.out.println("Connected to server!");
 
-        try (Socket socket = new Socket(host, port)) {
-            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+            // Input and output streams
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.println("Connected to server. Type messages (type 'exit' to quit):");
-
-            String message;
-            while (true) 
-            {
+            // Communication
+            String msgToServer, msgFromServer;
+            while (true) {
                 System.out.print("You: ");
-                message = userInput.readLine();
-                output.println(message);
+                msgToServer = input.readLine();
+                out.println(msgToServer);
 
-                if (message.equalsIgnoreCase("exit")) 
-                {
-                    break;
-                }
+                msgFromServer = in.readLine();
+                System.out.println("Server: " + msgFromServer);
 
-                String response = input.readLine();
-                System.out.println(response);
+                if (msgToServer.equalsIgnoreCase("bye")) break;
             }
 
+            // Close connections
+            input.close();
+            in.close();
+            out.close();
             socket.close();
+            System.out.println("Connection closed.");
 
-        } 
-        catch (IOException e) 
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

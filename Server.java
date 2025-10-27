@@ -3,32 +3,38 @@ import java.net.*;
 
 public class Server {
     public static void main(String[] args) {
-        int port = 5000; // Port number
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try {
+            // Create server socket at port 5000
+            ServerSocket serverSocket = new ServerSocket(5000);
             System.out.println("Server started. Waiting for client...");
 
-            Socket socket = serverSocket.accept(); // Wait for client to connect
+            // Accept client connection
+            Socket socket = serverSocket.accept();
             System.out.println("Client connected!");
 
             // Input and output streams
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             // Communication
-            String message;
-            while ((message = input.readLine()) != null) {
-                System.out.println("Client says: " + message);
-                output.println("Server received: " + message);
-
-                if (message.equalsIgnoreCase("exit")) {
-                    System.out.println("Client disconnected.");
+            String msgFromClient;
+            while ((msgFromClient = in.readLine()) != null) {
+                System.out.println("Client: " + msgFromClient);
+                if (msgFromClient.equalsIgnoreCase("bye")) {
+                    out.println("Goodbye!");
                     break;
                 }
+                out.println("Server received: " + msgFromClient);
             }
 
+            // Close connections
+            in.close();
+            out.close();
             socket.close();
             serverSocket.close();
-        } catch (IOException e) {
+            System.out.println("Server closed.");
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
